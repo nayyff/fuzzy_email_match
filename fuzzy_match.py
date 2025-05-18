@@ -2,21 +2,22 @@ import pandas as pd
 from rapidfuzz import process, fuzz
 from tqdm import tqdm
 import re
+import os
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill
 
 def normalize_name(name):
     name = str(name).lower()
     # Handle common abbreviations
-    name = re.sub(r'\bm\.?\b', 'moch', name)  # Contoh: M. -> moch
-    name = re.sub(r'\bs\.?\b', 'siti', name)  # Tambahkan pola lain jika diperlukan
-    # Remove single-character tokens
+    name = re.sub(r'\bm\.?\b', 'moch', name)
+    name = re.sub(r'\bs\.?\b', 'siti', name)
     name = ' '.join([word for word in name.split() if len(word) > 1])
-    # Remove non-alphanumeric characters
     name = re.sub(r'[^a-z0-9\s]', '', name)
-    # Collapse multiple spaces
     name = re.sub(r'\s+', ' ', name).strip()
     return name
+
+# Buat folder output jika belum ada
+os.makedirs('output', exist_ok=True)
 
 # Load data
 data_lengkap = pd.read_excel('data_lengkap.xlsx', sheet_name=None)
@@ -45,7 +46,7 @@ for sheet in tqdm(sheet_names, desc='Memproses semua kelas'):
     matched_flags = []
     for idx, name in enumerate(df_lengkap['nama_siswa_norm']):
         match = process.extractOne(name, email_dict.keys(), scorer=fuzz.partial_ratio)
-        if match and match[1] > 80:  # Menurunkan threshold ke 80
+        if match and match[1] > 80:
             matched_emails.append(email_dict[match[0]])
             matched_flags.append(True)
         else:
@@ -61,12 +62,16 @@ for sheet in tqdm(sheet_names, desc='Memproses semua kelas'):
 # Simpan ke file Excel dengan formatting
 red_fill = PatternFill(start_color='FF0000', end_color='FF0000', fill_type='solid')
 
-with pd.ExcelWriter('hasil_update_semua_kelas.xlsx', engine='openpyxl') as writer:
+# Path output
+output_path = os.path.join('output', 'hasil_update_semua_kelas.xlsx')
+daftar_tidak_path = os.path.join('output', 'daftar_tidak_tercocok.xlsx')
+
+with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
     for sheet in sheet_names:
         processed_sheets[sheet][0].to_excel(writer, sheet_name=sheet, index=False)
 
 # Tambahkan formatting
-wb = load_workbook('hasil_update_semua_kelas.xlsx')
+wb = load_workbook(output_path)
 for sheet in sheet_names:
     ws = wb[sheet]
     flags = processed_sheets[sheet][1]
@@ -74,9 +79,9 @@ for sheet in sheet_names:
         if not flag:
             for cell in ws[row_idx]:
                 cell.fill = red_fill
-wb.save('hasil_update_semua_kelas.xlsx')
+wb.save(output_path)
 
 # Simpan daftar tidak tercocok
-pd.DataFrame(daftar_tidak_tercocok).to_excel('daftar_tidak_tercocok.xlsx', index=False)
+pd.DataFrame(daftar_tidak_tercocok).to_excel(daftar_tidak_path, index=False)
 
-print('Proses selesai! File hasil disimpan di hasil_update_semua_kelas.xlsx')
+print(f'Proses selesai! File hasil disimpan di folder: {os.path.abspath("output")}')
