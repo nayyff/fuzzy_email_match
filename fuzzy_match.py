@@ -23,7 +23,7 @@ os.makedirs('output', exist_ok=True)
 data_lengkap = pd.read_excel('data_lengkap.xlsx', sheet_name=None)
 data_email_benar = pd.read_excel('data_email_benar.xlsx', sheet_name=None)
 sheet_names = [f"XII-{i}" for i in range(1, 13)]
-daftar_tidak_tercocok = []
+daftar_tidak_cocok = []
 processed_sheets = {}
 
 # Proses pencocokan untuk setiap sheet
@@ -52,7 +52,7 @@ for sheet in tqdm(sheet_names, desc='Memproses semua kelas'):
         else:
             matched_emails.append(original_emails.iloc[idx] if has_email_column else '')
             matched_flags.append(False)
-            daftar_tidak_tercocok.append({'kelas': sheet, 'nama': df_lengkap.iloc[idx]['nama_siswa']})
+            daftar_tidak_cocok.append({'kelas': sheet, 'nama': df_lengkap.iloc[idx]['nama_siswa']})
     
     # Update dataframe
     df_lengkap['email'] = matched_emails
@@ -82,6 +82,6 @@ for sheet in sheet_names:
 wb.save(output_path)
 
 # Simpan daftar tidak tercocok
-pd.DataFrame(daftar_tidak_tercocok).to_excel(daftar_tidak_path, index=False)
+pd.DataFrame(daftar_tidak_cocok).to_excel(daftar_tidak_path, index=False)
 
 print(f'Proses selesai! File hasil disimpan di folder: {os.path.abspath("output")} Tool by:nayyff and deepseek <3')
