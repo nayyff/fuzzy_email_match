@@ -64,7 +64,7 @@ red_fill = PatternFill(start_color='FF0000', end_color='FF0000', fill_type='soli
 
 # Path output
 output_path = os.path.join('output', 'hasil_update_semua_kelas.xlsx')
-daftar_tidak_path = os.path.join('output', 'daftar_tidak_tercocok.xlsx')
+daftar_tidak_path = os.path.join('output', 'daftar_tidak_cocok.xlsx')
 
 with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
     for sheet in sheet_names:
