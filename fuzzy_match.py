@@ -84,4 +84,4 @@ wb.save(output_path)
 # Simpan daftar tidak tercocok
 pd.DataFrame(daftar_tidak_tercocok).to_excel(daftar_tidak_path, index=False)
 
-print(f'Proses selesai! File hasil disimpan di folder: {os.path.abspath("output")}')
+print(f'Proses selesai! File hasil disimpan di folder: {os.path.abspath("output")} Tool by:nayyff and deepseek <3')
