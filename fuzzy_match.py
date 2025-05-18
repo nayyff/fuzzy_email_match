@@ -8,7 +8,7 @@ from openpyxl.styles import PatternFill
 
 def normalize_name(name):
     name = str(name).lower()
-    # Handle common abbreviations
+    # Handle singkatan nama
     name = re.sub(r'\bm\.?\b', 'moch', name)
     name = re.sub(r'\bs\.?\b', 'siti', name)
     name = ' '.join([word for word in name.split() if len(word) > 1])
